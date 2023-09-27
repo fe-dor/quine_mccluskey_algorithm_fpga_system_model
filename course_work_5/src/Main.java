@@ -30,7 +30,7 @@ public class Main {
 
 
         //Группы
-        int[][][][] groups0 = new int[6][k][k][n+1];
+        int[][][][] groups = new int[6][k][k][n+1];
 
 
         //Распределение по группам
@@ -41,7 +41,7 @@ public class Main {
         for(int i = 0; i < ci; i++){
             c = count_of_1(implicants[i]);
             for(int j = 0; j < n; j++){
-                groups0[0][c][cn[0][c]][j] = implicants[i][j];
+                groups[0][c][cn[0][c]][j] = implicants[i][j];
             }
             cn[0][c]++;
         }
@@ -56,8 +56,7 @@ public class Main {
         int ml = 0; //merging level
         boolean cf = true; //comparing flag used to show that it was comparing on this comparing level
 
-        int[][][] groups1 = new int[k][k*2][n+1];
-        //Склеивание первой подгруппы внутри себя
+        //Склеивание подгрупп в цикле
 
         while(cf) {
             cf = false;
@@ -66,28 +65,28 @@ public class Main {
                 cmp_d = cmp_u + 1;
                 for (int i = 0; i < cn[ml][cmp_u]; i++) {
                     for (int j = 0; j < cn[ml][cmp_d]; j++) {
-                        cmp_out = compare_for_merging(groups0[ml][cmp_u][i], groups0[ml][cmp_d][j]); //больше 0 если можно склеить
+                        cmp_out = compare_for_merging(groups[ml][cmp_u][i], groups[ml][cmp_d][j]); //больше 0 если можно склеить
                         if (cmp_out >= 0) {
                             cf = true;
-                            local = groups0[ml][cmp_u][i].clone();
+                            local = groups[ml][cmp_u][i].clone();
                             local[cmp_out] = 3;
                             local[n] = 0;
 
-                            groups0[ml][cmp_u][i][n] = 4;
-                            groups0[ml][cmp_d][j][n] = 4;
+                            groups[ml][cmp_u][i][n] = 4;
+                            groups[ml][cmp_d][j][n] = 4;
 
                             c = count_of_1(local);
 
                             wf = true;
                             for (int p = 0; p < cn[ml + 1][c]; p++) {
-                                if (compare_implicants(local, groups0[ml + 1][c][p])) {
+                                if (compare_implicants(local, groups[ml + 1][c][p])) {
                                     wf = false;
                                     break;
                                 }
                             }
 
                             if (wf) {
-                                groups0[ml + 1][c][cn[ml + 1][c]] = local;
+                                groups[ml + 1][c][cn[ml + 1][c]] = local;
                                 cn[ml + 1][c]++;
                             }
                         }
@@ -98,90 +97,15 @@ public class Main {
             ml++;
         }
 
-        /*
 
-        int[][][] groups2 = new int[k][k*2][n+1];
-        //Склеивание второй подгруппы внутри себя
-        for(cmp_u = 0; cmp_u < 5; cmp_u++) {
-            cmp_d = cmp_u + 1;
-            for (int i = 0; i < cn[1][cmp_u]; i++) {
-                for (int j = 0; j < cn[1][cmp_d]; j++) {
-                    cmp_out = compare_for_merging(groups1[cmp_u][i], groups1[cmp_d][j]); //больше 0 если можно склеить
-                    if (cmp_out >= 0) {
-                        local = groups1[cmp_u][i].clone();
-                        local[cmp_out] = 3;
-                        local[n] = 0;
+        output_cmd(groups, cn);
 
-                        groups1[cmp_u][i][n] = 4;
-                        groups1[cmp_d][j][n] = 4;
-
-                        c = count_of_1(local);
-
-                        wf = true;
-                        for (int p = 0; p < cn[2][c]; p++) {
-                            if (compare_implicants(local, groups2[c][p])) {
-                                wf = false;
-                                break;
-                            }
-                        }
-
-                        if (wf) {
-                            groups2[c][cn[2][c]] = local;
-                            cn[2][c]++;
-                        }
-                    }
-                }
-            }
-        }
-
-        int[][][] groups3 = new int[k][k*2][n+1];
-        //Склеивание второй подгруппы внутри себя
-        for(cmp_u = 0; cmp_u < 5; cmp_u++) {
-            cmp_d = cmp_u + 1;
-            for (int i = 0; i < cn[2][cmp_u]; i++) {
-                for (int j = 0; j < cn[2][cmp_d]; j++) {
-                    cmp_out = compare_for_merging(groups2[cmp_u][i], groups2[cmp_d][j]); //больше 0 если можно склеить
-                    if (cmp_out >= 0) {
-                        local = groups2[cmp_u][i].clone();
-                        local[cmp_out] = 3;
-                        local[n] = 0;
-
-                        groups2[cmp_u][i][n] = 4;
-                        groups2[cmp_d][j][n] = 4;
-
-                        c = count_of_1(local);
-
-                        wf = true;
-                        for (int p = 0; p < cn[3][c]; p++) {
-                            if (compare_implicants(local, groups3[c][p])) {
-                                wf = false;
-                                break;
-                            }
-                        }
-
-                        if (wf) {
-                            groups3[c][cn[3][c]] = local;
-                            cn[3][c]++;
-                        }
-                    }
-                }
-            }
-        }
+        //Таблица Квайна
 
 
-*/
+    }
 
-
-
-
-//            for (int i = 0; i < implicants.length; i++){
-//                for (int j = 0; j < implicants[0].length; j++){
-//                    System.out.print(implicants[i][j] + " ");
-//                }
-//                System.out.println();
-//            }
-
-
+    static void output_cmd(int[][][][] groups0, int[][] cn){
         for(int r = 0; r < 6; r++) {
             for (int i = 0; i <= n; i++) {
                 for (int j = 0; j < cn[r][i]; j++) {
@@ -194,7 +118,6 @@ public class Main {
                 System.out.println();
             }
         }
-
     }
 
     static int count_of_1(int[] bin_num){
