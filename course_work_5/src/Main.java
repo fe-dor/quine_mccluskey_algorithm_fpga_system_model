@@ -16,7 +16,7 @@ public class Main {
         //Получаем список импликант
         ci = 0;
         String binary;
-        int bs = 0;
+        int bs;
         for(int i = 0; i < k; i++){
             if(func[i] == 1) {
                 binary = Integer.toBinaryString(i);
@@ -40,7 +40,7 @@ public class Main {
 
         for(int i = 0; i < ci; i++){
             c = count_of_1(implicants[i]);
-            for(int j = 0; j < n; j++){
+            for(int j = 0; j < n; j++){ //Это ок, потому что системная модель пишется с учетом будущей реализации на verilog
                 groups[0][c][cn[0][c]][j] = implicants[i][j];
             }
             cn[0][c]++;
@@ -48,11 +48,11 @@ public class Main {
 
         //Группа с 4 переменными и одной *
         int local_count = 0;
-        int cmp_out = 0; //result of compare two numbers
-        int[] local = new int[n+1]; //new number got by merging
-        int cmp_d = 0; //compare down
-        int cmp_u = 0; //compare up
-        boolean wf = true; //write flag
+        int cmp_out; //result of compare two numbers
+        int[] local; //new number got by merging
+        int cmp_d; //compare down
+        int cmp_u; //compare up
+        boolean wf; //write flag
         int ml = 0; //merging level
         boolean cf = true; //comparing flag used to show that it was comparing on this comparing level
 
@@ -65,6 +65,7 @@ public class Main {
                 cmp_d = cmp_u + 1;
                 for (int i = 0; i < cn[ml][cmp_u]; i++) {
                     for (int j = 0; j < cn[ml][cmp_d]; j++) {
+                        //Функции сравнения вынести в виде task'ов
                         cmp_out = compare_for_merging(groups[ml][cmp_u][i], groups[ml][cmp_d][j]); //больше 0 если можно склеить
                         if (cmp_out >= 0) {
                             cf = true;
@@ -98,10 +99,70 @@ public class Main {
         }
 
 
-        output_cmd(groups, cn);
+        //output_cmd(groups, cn);
 
         //Таблица Квайна
+        int[][] quine_table = new int[32][32];
 
+        //Массив простых импликант
+        int[][] si = new int[32][6];
+
+        //Поиск всех простых импликант
+        int csi = 0; //count of simple implicants
+
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 6; j++) {
+                for (int b = 0; b < cn[i][j]; b++){
+                    if (groups[i][j][b][n] == 0){
+                        si[csi] = groups[i][j][b].clone();
+                        csi++;
+                    }
+                }
+            }
+        }
+
+        //Массив 1-точек функции
+        int[][] p1 = new int[32][6];
+
+        int cp1 = 0; //count of point 1
+
+        for (int i = 0; i < 6; i++){
+            for (int j = 0; j < cn[0][i]; j++) {
+                p1[cp1] = groups[0][i][j].clone();
+                cp1++;
+            }
+        }
+
+        //Заполнение таблицы Квайна
+        for(int i = 0; i < ci; i++){
+            for(int j = 0; j < csi; j++){
+                if (compare_for_q_table(p1[i], si[j]))
+                    quine_table[i][j] = 1;
+            }
+        }
+
+        //Поиск ядерных импликант
+        int cicr; //core_implicant_check result
+        for(int i = 0; i < ci; i++){
+            cicr = core_implicant_check(quine_table[i], csi);
+            if(cicr >= 0) {
+                si[cicr][n] = 4;
+            }
+        }
+
+        //Вывод таблицы Квайна
+        for (int i = 0; i < csi; i++){
+            System.out.print(si[i][0]+""+si[i][1]+""+si[i][2]+""+si[i][3]+""+si[i][4]+""+si[i][5]+" ");
+        }
+        System.out.println();
+        for(int i = 0; i < ci; i++){
+            for(int j = 0; j < csi; j++){
+                System.out.print(quine_table[i][j] + " ");
+            }
+            System.out.println();
+        }
+
+        //Далее будем использовать одну из вариаций метода петрика.
 
     }
 
@@ -129,6 +190,22 @@ public class Main {
         return c;
     }
 
+    static int core_implicant_check(int[] a, int csi){
+        int pos = 0;
+        int c = 0;
+        for (int i = 0; i < csi; i++){
+            if(a[i] == 1) {
+                c++;
+                pos = i;
+            }
+        }
+        if (c == 1)
+            return pos;
+        else
+            return -1;
+    }
+
+
     static int compare_for_merging(int[] f1, int[] f2){
         int local_count = 0;
         int t_pos = 0;
@@ -147,6 +224,15 @@ public class Main {
     static boolean compare_implicants(int[] f1, int[] f2){
         for (int i = 0; i < n; i++){
             if (f1[i] != f2[i]){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static boolean compare_for_q_table(int[] p1, int[] si) {
+        for (int i = 0; i < 5; i++){
+            if (!(p1[i] == si[i] || si[i] == 3)){
                 return false;
             }
         }
