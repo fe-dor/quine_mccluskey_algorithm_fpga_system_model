@@ -2,7 +2,7 @@ import java.util.Arrays;
 
 public class Main {
     //Ввод данных с платы:
-    static int n = 5; //разрядность функции
+    static int n0 = 5; //разрядность функции
     static int[] func = {0,1,1,0,0,1,1,1,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0};//вектор
 
     static int n1 = 5; //разрядность функции
@@ -12,7 +12,7 @@ public class Main {
     static int[] func2 = string_to_array("00101000101100010010100010110001");//вектор
 
     static int n3 = 5; //разрядность функции
-    static int[] func3 = string_to_array("01100111110011001100110011001100");//вектор
+    static int[] func3 = string_to_array("00101000101100010010100010110001");//вектор
 
     public static void main(String[] args) {
         //quineMcCluskey(func, n);
@@ -59,7 +59,7 @@ public class Main {
         int[][] cn = new int[6][n+1];
 
         for(int i = 0; i < ci; i++){
-            c = count_of_1(implicants[i]);
+            c = count_of_1(implicants[i], n);
             for(int j = 0; j < n; j++){ //Это ок, потому что системная модель пишется с учетом будущей реализации на verilog
                 groups[0][c][cn[0][c]][j] = implicants[i][j];
             }
@@ -81,12 +81,12 @@ public class Main {
         while(cf) {
             cf = false;
 
-            for (cmp_u = 0; cmp_u < 5; cmp_u++) {
+            for (cmp_u = 0; cmp_u < n; cmp_u++) {
                 cmp_d = cmp_u + 1;
                 for (int i = 0; i < cn[ml][cmp_u]; i++) {
                     for (int j = 0; j < cn[ml][cmp_d]; j++) {
                         //Функции сравнения вынести в виде task'ов
-                        cmp_out = compare_for_merging(groups[ml][cmp_u][i], groups[ml][cmp_d][j]); //больше 0 если можно склеить
+                        cmp_out = compare_for_merging(groups[ml][cmp_u][i], groups[ml][cmp_d][j], n); //больше 0 если можно склеить
                         if (cmp_out >= 0) {
                             cf = true;
                             local = groups[ml][cmp_u][i].clone();
@@ -96,11 +96,11 @@ public class Main {
                             groups[ml][cmp_u][i][n] = 4;
                             groups[ml][cmp_d][j][n] = 4;
 
-                            c = count_of_1(local);
+                            c = count_of_1(local, n);
 
                             wf = true;
                             for (int p = 0; p < cn[ml + 1][c]; p++) {
-                                if (compare_implicants(local, groups[ml + 1][c][p])) {
+                                if (compare_implicants(local, groups[ml + 1][c][p], n)) {
                                     wf = false;
                                     break;
                                 }
@@ -130,8 +130,8 @@ public class Main {
         //Поиск всех простых импликант
         int cpi = 0; //count of prime implicants
 
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 6; j++) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
                 for (int b = 0; b < cn[i][j]; b++){
                     if (groups[i][j][b][n] == 0){
                         pi[cpi] = groups[i][j][b].clone();
@@ -146,10 +146,10 @@ public class Main {
 
         int cp1 = 0; //count of point 1
 
-        for (int i = 0; i < 6; i++){
+        for (int i = 0; i < n; i++){
             for (int j = 0; j < cn[0][i]; j++) {
                 p1[cp1] = groups[0][i][j].clone();
-                p1[cp1][5] = 0;
+                p1[cp1][n] = 0;
                 cp1++;
             }
         }
@@ -157,7 +157,7 @@ public class Main {
         //Заполнение таблицы Квайна
         for(int i = 0; i < ci; i++){
             for(int j = 0; j < cpi; j++){
-                if (compare_for_q_table(p1[i], pi[j]))
+                if (compare_for_q_table(p1[i], pi[j], n))
                     quine_table[i][j] = 1;
             }
         }
@@ -175,10 +175,10 @@ public class Main {
 
         //Отмечаем строки, перекрытые ядерными импликантами
         for (int i = 0; i < cpi; i++){
-            if(pi[i][5] == 4){
+            if(pi[i][n] == 4){
                 for (int j = 0; j < cp1; j++){
                     if (quine_table[j][i] == 1){
-                        p1[j][5] = 4;
+                        p1[j][n] = 4;
                     }
                 }
             }
@@ -188,7 +188,7 @@ public class Main {
         int[][][] petrick_table = new int[32][32][32];
         int l = 0; //petrick table level
         for (int i = 0; i < cp1; i++){
-            if(p1[i][5] == 0) {
+            if(p1[i][n] == 0) {
                 petrick_table[0][c1pt[0]] = quine_table[i].clone();
                 c1pt[0]++;
             }
@@ -211,7 +211,7 @@ public class Main {
                     pei = i;
                 }
             }
-            pi[pei][5] = 4;
+            pi[pei][n] = 4;
             for (int i = 0; i < c1pt[l]; i++) {
                 if (petrick_table[l][i][pei] != 1) {
                     petrick_table[l + 1][c1pt[l + 1]] = petrick_table[l][i].clone();
@@ -228,9 +228,9 @@ public class Main {
 
 
         //Вывод таблицы Квайна
-        for (int i = 0; i < cpi; i++){
+        /*for (int i = 0; i < cpi; i++){
             System.out.print(pi[i][0]+""+pi[i][1]+""+pi[i][2]+""+pi[i][3]+""+pi[i][4]+""+pi[i][5]+" ");
-        }
+        }*/
         System.out.println();
         for(int i = 0; i < ci; i++){
             System.out.print(Arrays.toString(p1[i]) + " ");
@@ -248,14 +248,14 @@ public class Main {
         }
         System.out.println();
         for (int i = 0; i < cpi; i++){
-            if(pi[i][5] == 4) {
+            if(pi[i][n] == 4) {
                 System.out.print(Arrays.toString(pi[i]) + " ");
             }
         }
 
     }
 
-    static void output_cmd(int[][][][] groups0, int[][] cn){
+    static void output_cmd(int[][][][] groups0, int[][] cn, int n){
         for(int r = 0; r < 6; r++) {
             for (int i = 0; i <= n; i++) {
                 for (int j = 0; j < cn[r][i]; j++) {
@@ -270,7 +270,7 @@ public class Main {
         }
     }
 
-    static int count_of_1(int[] bin_num){
+    static int count_of_1(int[] bin_num, int n){
         int c = 0;
         for (int j = 0; j < n; j++){
             if (bin_num[j] == 1)
@@ -295,7 +295,7 @@ public class Main {
     }
 
 
-    static int compare_for_merging(int[] f1, int[] f2){
+    static int compare_for_merging(int[] f1, int[] f2, int n){
         int local_count = 0;
         int t_pos = 0;
         for(int t = 0; t < n; t++){
@@ -310,7 +310,7 @@ public class Main {
             return -1;
     }
 
-    static boolean compare_implicants(int[] f1, int[] f2){
+    static boolean compare_implicants(int[] f1, int[] f2, int n){
         for (int i = 0; i < n; i++){
             if (f1[i] != f2[i]){
                 return false;
@@ -319,8 +319,8 @@ public class Main {
         return true;
     }
 
-    static boolean compare_for_q_table(int[] p1, int[] si) {
-        for (int i = 0; i < 5; i++){
+    static boolean compare_for_q_table(int[] p1, int[] si, int n) {
+        for (int i = 0; i < n; i++){
             if (!(p1[i] == si[i] || si[i] == 3)){
                 return false;
             }
