@@ -12,11 +12,14 @@ public class Main {
     static int[] func2 = string_to_array("00101000101100010010100010110001");//вектор
 
     static int n3 = 5; //разрядность функции
-    static int[] func3 = string_to_array("00101000101100010010100010110001");//вектор
+    static int[] func3 = string_to_array("01100111110011001100110011001100");//вектор
+
+    static int n4 = 2; //разрядность функции
+    static int[] func4 = string_to_array("0110");//вектор
 
     public static void main(String[] args) {
         //quineMcCluskey(func, n);
-        quineMcCluskey(func3, n3);
+        quineMcCluskey(func4, n4);
     }
 
     private static int[] string_to_array(String str){
@@ -240,6 +243,7 @@ public class Main {
             System.out.println();
         }
         System.out.println();
+        //Вывод Петрика
         for (int i = 0; i < c1pt[0]; i++){
             for (int j = 0; j < cpi; j++){
                 System.out.print(petrick_table[0][i][j] + " ");
