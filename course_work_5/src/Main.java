@@ -15,11 +15,11 @@ public class Main {
     static int[] func3 = string_to_array("01100111110011001100110011001101");//вектор
 
     static int n4 = 2; //разрядность функции
-    static int[] func4 = string_to_array("0110");//вектор
+    static int[] func4 = string_to_array("11");//вектор
 
     public static void main(String[] args) {
         //quineMcCluskey(func, n);
-        quineMcCluskey(func3, n3);
+        quineMcCluskey(func4, n4);
     }
 
     private static int[] string_to_array(String str){
@@ -149,7 +149,7 @@ public class Main {
 
         int cp1 = 0; //count of point 1
 
-        for (int i = 0; i < n; i++){
+        for (int i = 0; i < n+1; i++){
             for (int j = 0; j < cn[0][i]; j++) {
                 p1[cp1] = groups[0][i][j].clone();
                 p1[cp1][n] = 0;
