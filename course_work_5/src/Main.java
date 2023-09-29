@@ -105,17 +105,17 @@ public class Main {
         int[][] quine_table = new int[32][32];
 
         //Массив простых импликант
-        int[][] si = new int[32][6];
+        int[][] pi = new int[32][6]; //prime implicants
 
         //Поиск всех простых импликант
-        int csi = 0; //count of simple implicants
+        int cpi = 0; //count of prime implicants
 
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 6; j++) {
                 for (int b = 0; b < cn[i][j]; b++){
                     if (groups[i][j][b][n] == 0){
-                        si[csi] = groups[i][j][b].clone();
-                        csi++;
+                        pi[cpi] = groups[i][j][b].clone();
+                        cpi++;
                     }
                 }
             }
@@ -129,14 +129,15 @@ public class Main {
         for (int i = 0; i < 6; i++){
             for (int j = 0; j < cn[0][i]; j++) {
                 p1[cp1] = groups[0][i][j].clone();
+                p1[cp1][5] = 0;
                 cp1++;
             }
         }
 
         //Заполнение таблицы Квайна
         for(int i = 0; i < ci; i++){
-            for(int j = 0; j < csi; j++){
-                if (compare_for_q_table(p1[i], si[j]))
+            for(int j = 0; j < cpi; j++){
+                if (compare_for_q_table(p1[i], pi[j]))
                     quine_table[i][j] = 1;
             }
         }
@@ -144,25 +145,33 @@ public class Main {
         //Поиск ядерных импликант
         int cicr; //core_implicant_check result
         for(int i = 0; i < ci; i++){
-            cicr = core_implicant_check(quine_table[i], csi);
+            cicr = core_implicant_check(quine_table[i], cpi);
             if(cicr >= 0) {
-                si[cicr][n] = 4;
+                pi[cicr][n] = 4;
             }
         }
 
+        //Отмечаем строки, перекрытые ядерными импликантами
+
+        //Создадим отдельную табличку для Петрика из оставшихся простых импликант
+
+        //Далее будем использовать одну из вариаций метода петрика.
+
+
+
         //Вывод таблицы Квайна
-        for (int i = 0; i < csi; i++){
-            System.out.print(si[i][0]+""+si[i][1]+""+si[i][2]+""+si[i][3]+""+si[i][4]+""+si[i][5]+" ");
+        for (int i = 0; i < cpi; i++){
+            System.out.print(pi[i][0]+""+pi[i][1]+""+pi[i][2]+""+pi[i][3]+""+pi[i][4]+""+pi[i][5]+" ");
         }
         System.out.println();
         for(int i = 0; i < ci; i++){
-            for(int j = 0; j < csi; j++){
+            for(int j = 0; j < cpi; j++){
                 System.out.print(quine_table[i][j] + " ");
             }
             System.out.println();
         }
 
-        //Далее будем использовать одну из вариаций метода петрика.
+
 
     }
 
