@@ -1,10 +1,30 @@
+import java.util.Arrays;
+
 public class Main {
     //Ввод данных с платы:
     static int n = 5; //разрядность функции
     static int[] func = {0,1,1,0,0,1,1,1,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0};//вектор
 
+    static int n1 = 5; //разрядность функции
+    static int[] func1 = {1,1,1,0,0,1,1,1,1,1,0,1,1,1,0,0,0,1,0,0,1,1,0,0,0,1,0,0,1,1,0,0};//вектор
+
+    static int n2 = 5; //разрядность функции
+    static int[] func2 = string_to_array("00101000101100010010100010110001");//вектор
+
+    static int n3 = 5; //разрядность функции
+    static int[] func3 = string_to_array("01100111110011001100110011001100");//вектор
+
     public static void main(String[] args) {
-        quineMcCluskey(func, n);
+        //quineMcCluskey(func, n);
+        quineMcCluskey(func3, n3);
+    }
+
+    private static int[] string_to_array(String str){
+        int[] arr = new int[str.length()];
+        for (int i = 0; i < str.length(); i++){
+            arr[i] = Integer.parseInt(String.valueOf(str.charAt(i)));
+        }
+        return arr;
     }
 
     static void quineMcCluskey(int[] func, int n){
@@ -144,19 +164,67 @@ public class Main {
 
         //Поиск ядерных импликант
         int cicr; //core_implicant_check result
+        int cci = 0;
         for(int i = 0; i < ci; i++){
             cicr = core_implicant_check(quine_table[i], cpi);
             if(cicr >= 0) {
                 pi[cicr][n] = 4;
+                cci++;
             }
         }
 
         //Отмечаем строки, перекрытые ядерными импликантами
-
+        for (int i = 0; i < cpi; i++){
+            if(pi[i][5] == 4){
+                for (int j = 0; j < cp1; j++){
+                    if (quine_table[j][i] == 1){
+                        p1[j][5] = 4;
+                    }
+                }
+            }
+        }
         //Создадим отдельную табличку для Петрика из оставшихся простых импликант
-
+        int[] c1pt = new int[32];
+        int[][][] petrick_table = new int[32][32][32];
+        int l = 0; //petrick table level
+        for (int i = 0; i < cp1; i++){
+            if(p1[i][5] == 0) {
+                petrick_table[0][c1pt[0]] = quine_table[i].clone();
+                c1pt[0]++;
+            }
+        }
         //Далее будем использовать одну из вариаций метода петрика.
+        int pei = 0;//position of extra implicant
+        int cei = 0; //count of extra implicants
+        int c1c = 0; //count of 1 in column
+        int max_c1c = 0;
 
+        while(true) {
+            for (int i = 0; i < cpi; i++) {
+                for (int j = 0; j < c1pt[l]; j++) {
+                    if (petrick_table[l][j][i] == 1) {
+                        c1c++;
+                    }
+                }
+                if (c1c > max_c1c) {
+                    max_c1c = c1c;
+                    pei = i;
+                }
+            }
+            pi[pei][5] = 4;
+            for (int i = 0; i < c1pt[l]; i++) {
+                if (petrick_table[l][i][pei] != 1) {
+                    petrick_table[l + 1][c1pt[l + 1]] = petrick_table[l][i].clone();
+                    c1pt[l + 1]++;
+                }
+            }
+            if (c1pt[l + 1] == 0) {
+                break;
+            }
+            l++;
+            c1c = 0;
+            max_c1c = 0;
+        }
 
 
         //Вывод таблицы Квайна
@@ -165,13 +233,25 @@ public class Main {
         }
         System.out.println();
         for(int i = 0; i < ci; i++){
+            System.out.print(Arrays.toString(p1[i]) + " ");
             for(int j = 0; j < cpi; j++){
                 System.out.print(quine_table[i][j] + " ");
             }
             System.out.println();
         }
-
-
+        System.out.println();
+        for (int i = 0; i < c1pt[0]; i++){
+            for (int j = 0; j < cpi; j++){
+                System.out.print(petrick_table[0][i][j] + " ");
+            }
+            System.out.println();
+        }
+        System.out.println();
+        for (int i = 0; i < cpi; i++){
+            if(pi[i][5] == 4) {
+                System.out.print(Arrays.toString(pi[i]) + " ");
+            }
+        }
 
     }
 
