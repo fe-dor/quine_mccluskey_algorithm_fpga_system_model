@@ -52,11 +52,11 @@ public class Run {
             }
         }
         //Вывод всех импликант
-        /*for (int[] impl : implicants) {
+        for (int[] impl : implicants) {
             System.out.print(Arrays.toString(impl) + " ");
         }
         System.out.println();
-        System.out.println(ci); //Вывод кол-ва импликант*/
+        System.out.println(ci); //Вывод кол-ва импликант
 
         //Группы
         int[][][][] groups = new int[6][k][k][n+1];

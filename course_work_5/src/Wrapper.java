@@ -5,7 +5,9 @@ public class Wrapper {
     static int n2 = 5; //разрядность функции
     static int[] func2 = string_to_array("00101000101100010010100010110001");//вектор
     static int n3 = 5; //разрядность функции
-    static int[] func3 = string_to_array("00110101010110001000001001101001");//вектор
+    static int[] func3 = string_to_array("10111111111110111010011110100101");//вектор
+    static int n4 = 4; //разрядность функции
+    static int[] func4 = string_to_array("1111101110100111");//вектор
 
     public static void main(String[] args) {
         ArrayList<int[]> result = Run.quineMcCluskey(func3, n3);
@@ -34,7 +36,7 @@ public class Wrapper {
         ArrayList<String> res = new ArrayList<>();
         StringBuilder buf = new StringBuilder();
         for (int[] ints : bitForm) {
-            for (int j = 0; j < ints.length; j++) {
+            for (int j = 0; j < ints.length - 1; j++) {
                 if (ints[j] != 3) {
                     switch (j) {
                         case 0 -> buf.append(ints[j] == 0 ? "a" : "A");
