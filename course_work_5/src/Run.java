@@ -1,6 +1,7 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Main {
+public class Run {
     //Ввод данных с платы:
     static int n0 = 5; //разрядность функции
     static int[] func = {0,1,1,0,0,1,1,1,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0};//вектор
@@ -12,14 +13,14 @@ public class Main {
     static int[] func2 = string_to_array("00101000101100010010100010110001");//вектор
 
     static int n3 = 5; //разрядность функции
-    static int[] func3 = string_to_array("01100111110011001100110011001101");//вектор
+    static int[] func3 = string_to_array("11101010101110100100001110011110");//вектор
 
     static int n4 = 2; //разрядность функции
     static int[] func4 = string_to_array("11");//вектор
 
     public static void main(String[] args) {
         //quineMcCluskey(func, n);
-        quineMcCluskey(func4, n4);
+        quineMcCluskey(func3, n3);
     }
 
     private static int[] string_to_array(String str){
@@ -30,7 +31,7 @@ public class Main {
         return arr;
     }
 
-    static void quineMcCluskey(int[] func, int n){
+    static ArrayList<int[]> quineMcCluskey(int[] func, int n){
         int k = (int) Math.pow(2, n);
         //Массив регистров со всеми импилкантами, размер одного регситра - n, размер массива 2**n
         int[][] implicants = new int[k][n];
@@ -50,7 +51,12 @@ public class Main {
                 ci++;
             }
         }
-
+        //Вывод всех импликант
+        /*for (int[] impl : implicants) {
+            System.out.print(Arrays.toString(impl) + " ");
+        }
+        System.out.println();
+        System.out.println(ci); //Вывод кол-ва импликант*/
 
         //Группы
         int[][][][] groups = new int[6][k][k][n+1];
@@ -133,8 +139,8 @@ public class Main {
         //Поиск всех простых импликант
         int cpi = 0; //count of prime implicants
 
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
+        for (int i = 0; i <= n; i++) {
+            for (int j = 0; j <= n; j++) {
                 for (int b = 0; b < cn[i][j]; b++){
                     if (groups[i][j][b][n] == 0){
                         pi[cpi] = groups[i][j][b].clone();
@@ -143,6 +149,12 @@ public class Main {
                 }
             }
         }
+
+        //Вывод простых импликант
+        /*System.out.println("Вывод простых импликант:");
+        for (int[] imp : pi){
+            System.out.println(Arrays.toString(imp));
+        }*/
 
         //Массив 1-точек функции
         int[][] p1 = new int[32][6];
@@ -164,6 +176,19 @@ public class Main {
                     quine_table[i][j] = 1;
             }
         }
+
+        //Вывод таблицы Квайна
+        /*for (int i = 0; i < cpi; i++){
+            System.out.print(pi[i][0]+""+pi[i][1]+""+pi[i][2]+""+pi[i][3]+""+pi[i][4]+""+pi[i][5]+" ");
+        }
+        System.out.println();
+        for(int i = 0; i < ci; i++){
+            System.out.print(Arrays.toString(p1[i]) + " ");
+            for(int j = 0; j < cpi; j++){
+                System.out.print(quine_table[i][j] + " ");
+            }
+            System.out.println();
+        }*/
 
         //Поиск ядерных импликант
         int cicr; //core_implicant_check result
@@ -202,6 +227,8 @@ public class Main {
         int c1c = 0; //count of 1 in column
         int max_c1c = 0;
 
+
+
         while(true) {
             for (int i = 0; i < cpi; i++) {
                 for (int j = 0; j < c1pt[l]; j++) {
@@ -230,11 +257,11 @@ public class Main {
         }
 
 
-        //Вывод таблицы Квайна
+
         /*for (int i = 0; i < cpi; i++){
             System.out.print(pi[i][0]+""+pi[i][1]+""+pi[i][2]+""+pi[i][3]+""+pi[i][4]+""+pi[i][5]+" ");
         }*/
-        System.out.println();
+        /*System.out.println();
         for(int i = 0; i < ci; i++){
             System.out.print(Arrays.toString(p1[i]) + " ");
             for(int j = 0; j < cpi; j++){
@@ -250,12 +277,18 @@ public class Main {
             }
             System.out.println();
         }
-        System.out.println();
+        */
+        //System.out.println();
+        ArrayList<int[]> res = new ArrayList<>();
         for (int i = 0; i < cpi; i++){
             if(pi[i][n] == 4) {
-                System.out.print(Arrays.toString(pi[i]) + " ");
+                //System.out.print(Arrays.toString(pi[i]) + " ");
+                res.add(pi[i]);
             }
         }
+        return res;
+        //Переделать проект в maven.
+        //Добавить тесты для сравнения результатов двух алгоритмов.
 
     }
 
